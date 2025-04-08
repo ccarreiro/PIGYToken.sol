@@ -1,0 +1,65 @@
+solidez do pragma ^ 0 . 4 . 21 ;
+
+/ **
+    Implementação do token padrão HRC20Token
+* /
+contrato HRC20 {
+
+    string  public name = 'GEN SYS' ; // Mude para o seu nome de token.
+    string  public symbol = 'GNS' ; // Mude para o seu símbolo de token. Máximo de 4 letras!
+    
+    string  public standard = 'Token 0.1' ; // Não mude este.
+
+    uint8  decimais públicos = 8 ; // É recomendado definir decimais para 8.
+    
+    uint256  public totalSupply = 50000000 ; // Mude para o Suprimento Total do seu Token.
+
+    mapeamento ( endereço => uint256 ) public balanceOf;
+    mapeamento ( endereço => mapeamento (endereço => uint256) ) subsídio público ;
+
+    // Isso gera um evento público no blockchain que notificará os clientes
+    transferência de evento ( endereço  indexado  _de , endereço  indexado  _to , uint256  _value );
+
+    / **
+     * Função de construtor
+     *
+     * Inicializa o contrato com tokens de fornecimento inicial para o criador do contrato
+     * /
+    function HRC20 () public {
+        totalSupply =   totalSupply *  10  **  uint256 (decimais); // Atualize a oferta total com o valor decimal
+
+        balanceOf [ msg . remetente ] = totalSupply; // Dê ao criador todos os tokens iniciais
+    }
+
+    / **
+     * Transferência interna, só pode ser chamada por este contrato
+     * /
+    function _transfer ( address  _from , address  _to , uint  _value ) internal {
+        // Impede a transferência para o endereço 0x0. Use burn () ao invés
+        requer (_to ! =  0x0 );
+        // Verifique se o remetente tem o suficiente
+        requer (balanceOf [_from] > = _value);
+        // Verifique se há overflows
+        requer (balanceOf [_to] + _value > = balanceOf [_to]);
+        // Salve isso para uma declaração no futuro
+        uint previousBalances = balanceOf [_de] + balanceOf [_to];
+        // Subtraia do remetente
+        balanceOf [_from] - = _value;
+        // Adicione o mesmo ao destinatário
+        balanceOf [_to] + = _value;
+        emitir  Transfer (_from, _to, _value);
+        // Asserts são usados ​​para usar análise estática para encontrar bugs em seu código. Eles nunca deveriam falhar
+        assert (balanceOf [_from] + balanceOf [_to] == previousBalances);
+    }
+
+    / **
+     * Tokens de transferência
+     *
+     * Envie tokens `_value` para` _to` de sua conta
+     *
+     * @param _to O endereço do destinatário
+     * @param _value a quantia a enviar
+     * /
+    transferência de função ( endereço  _to , uint256  _value ) public {
+        _transfer ( msg . sender , _to, _value);
+    }
